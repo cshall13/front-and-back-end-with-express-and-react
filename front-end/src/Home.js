@@ -1,31 +1,19 @@
-// FRONT-END REACT
-
-
-import React, { Component } from 'react';
-import './App.css';
+import React, {Component} from 'react';
 import $ from 'jquery';
 import logo from './logo.svg';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
 import {Link} from 'react-router-dom';
 
-// Custom Modules
-import Home from './Home';
-import Delete from './Delete';
-import Edit from './Edit';
 
-class ToDo extends Component {
+class Home extends Component{
     constructor(props){
         super(props);
-        // this initializes the variable 'theClass' inside of state. this allows state to be changed
-        // !!!!!!!VERY IMPORTANT!!!!!!!!
         this.state = {
             taskList: []
-        }
-        this.addStudent = this.addStudent.bind(this);
+        };
+            this.addNewTask = this.addNewTask.bind(this);
     }
 
-    // this runs AFTER the first render
-    componentDidMount() {
+componentDidMount() {
         // getJSON request to localhost:3000 ... thats where Express is
         $.getJSON('http://localhost:3000/getTasks', (tasksFromApi)=>{
             // log the JSON response from express
@@ -42,11 +30,13 @@ class ToDo extends Component {
         // })
     }
 
-    addStudent(event){
-        // ################################event is 'click', target is 'the button', parentNode is 'add-box', childNodes is 'input tag'
-        var studentToAdd = event.target.parentNode.childNodes[0].value;
+    addNewTask(event){
+        event.preventDefault();
+        console.log("User submitted form")
+        var newTask = document.getElementById('new-task').value;
+        var newTaskDate = document.getElementById('new-task');
         // below is the same as above
-        // var studentToAdd = document.getElmentById('newStudent')
+        // var studentToAdd = document.getElementById('newStudent')
         //   console.log(studentToAdd);
 
 // ###############################                         ######################################
@@ -60,59 +50,55 @@ class ToDo extends Component {
         // which updates th list because we are mapping through 'this.state.theClass'
         $.ajax({
             method: "POST",
-            url: "http://localhost:3000/addStudent",
-            data: {name: studentToAdd}
-        }).done((studentsArray)=>{
+            url: "http://localhost:3000/addTask",
+            data: {
+                taskName: newTask,
+                taskDate: newTaskDate
+            }
+        }).done((tasksArray)=>{
             this.setState({
-                theClass: studentsArray
+                taskList: tasksArray
             })
         })
     }
 
+
     render() {
-        return(
-
-            <Router>
-                <div>
-                    <Route exact path="/" component = {Home}/>
-                    <Route path= "/task/delete/:taskId" component={Delete}/>
-                    <Route path="/task/edit/:taskId" component={Edit} />
-                </div>
-            </Router>
-        )
-
         // create an array to dump into our return. It will contain
-        // components or HTML tags
-        var theClassArray = [];
+        //     components or HTML tags
+        var taskArray = [];
         // loop through our state variable
-        this.state.taskList.map((task, index)=>{
+        this.state.taskList.map((task, index) => {
             // push an li tag onto our array for each element in the state
-            theClassArray.push(<li key={index}>{task.taskName}</li>)
+            taskArray.push(
+                <div key={index}>
+                    <ul>
+	      		        <li>{task.taskName}</li>
+                        <Link to={`/task/delete/${task.id}`}>Delete</Link> |
+                        <Link to={`/task/edit/${task.id}`}> Edit</Link>
+                    </ul>
+	      	    </div>
+            )
         });
-
         return (
-
-
             <div className="App">
                 <div className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
+                    <img src={logo} className="App-logo" alt="logo"/>
                     <h2>Welcome to React</h2>
                 </div>
                     <p className="App-intro">
                         To get started, edit <code>src/App.js</code> and save to reload.
                     </p>
-                <div className="add-box">
-                    <input type="text" id="newStudent" />
-                    <button onClick={this.addStudent}>Add Student</button>
-                        <p>
-                            {/*array dropped from 'theClassArray.push(<li key={index}>{student}</li>)'*/}
-                            {theClassArray}
-                        </p>
-                </div>
+                <form className="add-box">
+                    <input type="text" id="newTask" placeholder="New Task"/>
+                    <input type="date" id="newTask"/>
+                    <button type="submit">Add Task</button>
+                        {/*array dropped from 'theClassArray.push(<li key={index}>{student}</li>)'*/}
+                        {taskArray}
+                </form>
             </div>
-        );
+        )
     }
 }
 
-export default ToDo;
-
+export default Home;
