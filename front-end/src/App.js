@@ -1,9 +1,29 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import $ from 'jquery';
 
 class App extends Component {
+  constructor(props){
+      super(props);
+      this.state = {
+          theClass: []
+      }
+  }
+
+  componentDidMount() {
+    $.getJSON('http://localhost:3001/getStudents', (studentsFromApi)=>{
+        console.log(studentsFromApi)
+    });
+  }
+
   render() {
+
+      var theClassArray = [];
+      this.state.theClass.map((student, index)=>{
+          theClassArray.pust(<li key={index}>Student</li>)
+      });
+
     return (
       <div className="App">
         <div className="App-header">
@@ -13,6 +33,9 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
+          <p>
+              {theClassArray}
+          </p>
       </div>
     );
   }
