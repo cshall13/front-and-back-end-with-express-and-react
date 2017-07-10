@@ -12,13 +12,34 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-// set up a route to handle React's first request
-router.get('/getTasks', function(req, res, next) {
-    // this is a database query
-    connection.query('SELECT * FROM tasks', (error,results)=>{
-        if (error) throw error;
-        res.json(results);
+function validateKey(key){
+    console.log(key);
+    // promise runs first query, then waits until that is done THEN it runs second query
+    return new Promise((resolve, reject)=>{
+        connection.query('SELECT * FROM api_keys WHERE api_key="'+key+'"', [key], (error, results) => {
+            if (error) throw error;
+            if (results.length === 0) {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        })
     })
+}
+
+// Setup a route to handle React's first request
+router.get('/getTasks', function(req, res, next) {
+	var isKeyValid = validateKey(req.query.apiKey);
+	isKeyValid.then((bool)=>{
+		if(bool == true){
+			connection.query('SELECT * FROM tasks', (error, results)=>{
+				if (error) throw error;
+				res.json(results);
+			})
+		}else{
+			res.json({msg:"badKey"})
+		}
+	});
 });
 
 router.get('/getTask/:id', (req,res)=>{

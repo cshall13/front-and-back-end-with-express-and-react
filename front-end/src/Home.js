@@ -13,11 +13,11 @@ class Home extends Component{
             this.addNewTask = this.addNewTask.bind(this);
     }
 
-componentDidMount() {
+    componentDidMount() {
         // getJSON request to localhost:3000 ... thats where Express is
-        $.getJSON('http://localhost:3000/getTasks', (tasksFromApi)=>{
+        $.getJSON('http://localhost:3000/getTasks?apiKey=131313', (tasksFromApi)=>{
             // log the JSON response from express
-            // console.log(studentsFromApi)
+            console.log(tasksFromApi)
             //   update the state ... this will cause a re-render
             this.setState({
                 taskList: tasksFromApi
@@ -34,7 +34,7 @@ componentDidMount() {
         event.preventDefault();
         console.log("User submitted form")
         var newTask = document.getElementById('new-task').value;
-        var newTaskDate = document.getElementById('new-task');
+        var newTaskDate = document.getElementById('new-task-date').value;
         // below is the same as above
         // var studentToAdd = document.getElementById('newStudent')
         //   console.log(studentToAdd);
@@ -67,17 +67,16 @@ componentDidMount() {
         // create an array to dump into our return. It will contain
         //     components or HTML tags
         var taskArray = [];
+        console.log(this.state.taskList);
         // loop through our state variable
         this.state.taskList.map((task, index) => {
             // push an li tag onto our array for each element in the state
             taskArray.push(
-                <div key={index}>
-                    <ul>
-	      		        <li>{task.taskName}</li>
-                        <Link to={`/task/delete/${task.id}`}>Delete</Link> |
-                        <Link to={`/task/edit/${task.id}`}> Edit</Link>
-                    </ul>
-	      	    </div>
+                <tr key={index}>
+                    <td>{task.taskName}</td>
+                    <td><Link to={`/task/delete/${task.id}`}>Delete</Link></td>
+                    <td><Link to={`/task/edit/${task.id}`}> Edit</Link></td>
+	      	    </tr>
             )
         });
         return (
@@ -86,16 +85,25 @@ componentDidMount() {
                     <img src={logo} className="App-logo" alt="logo"/>
                     <h2>Welcome to React</h2>
                 </div>
-                    <p className="App-intro">
-                        To get started, edit <code>src/App.js</code> and save to reload.
-                    </p>
-                <form className="add-box">
-                    <input type="text" id="newTask" placeholder="New Task"/>
-                    <input type="date" id="newTask"/>
-                    <button type="submit">Add Task</button>
+                <div className="container">
+                    <form  onSubmit={this.addNewTask} className="add-box">
+                        <input type="text" id="new-task" placeholder="New Task"/>
+                        <input type="date" id="new-task-date"/>
+                        <button type="submit" className="btn btn-primary">Add Task</button>
+                    </form>
+                </div>
+
+                <table className="table table-bordered">
+                    <thead>
+                        <th>Task</th>
+                        <th>Delete</th>
+                        <th>Edit</th>
+                    </thead>
+                    <tbody>
                         {/*array dropped from 'theClassArray.push(<li key={index}>{student}</li>)'*/}
                         {taskArray}
-                </form>
+                    </tbody>
+                </table>
             </div>
         )
     }
